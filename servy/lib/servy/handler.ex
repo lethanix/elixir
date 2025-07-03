@@ -20,7 +20,15 @@ defmodule Servy.Handler do
   end
 
   def route(conv) do
-    %{conv | resp_body: "Lambda, SQS, S3"}
+    route(conv, conv.method, conv.path)
+  end
+
+  def route(conv, "GET", "/compute") do
+    %{ conv | resp_body: "Lambda, EC2" }
+  end
+
+  def route(conv, "GET", "/messaging") do
+    %{ conv | resp_body:  "SQS, SNS, MQ "}
   end
 
   def format_response(conv) do
@@ -35,7 +43,7 @@ defmodule Servy.Handler do
 end
 
 request = """
-GET /services HTTP/1.1
+GET /messaging HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
@@ -45,3 +53,16 @@ Accept: */*
 response = Servy.Handler.handle(request)
 
 IO.puts(response)
+
+request = """
+GET /compute HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+response = Servy.Handler.handle(request)
+
+IO.puts(response)
+
