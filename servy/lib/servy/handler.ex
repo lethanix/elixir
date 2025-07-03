@@ -17,8 +17,7 @@ defmodule Servy.Handler do
   end
 
   def route(conv) do
-    # TODO: Create a new map that also has the response body:
-    conv = %{method: "GET", path: "/services", resp_body: "Lambda, SQS, S3"}
+    %{conv | resp_body: "Lambda, SQS, S3"}
   end
 
   def format_response(conv) do
