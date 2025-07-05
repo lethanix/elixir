@@ -1,19 +1,19 @@
 defmodule Servy.Handler do
   def handle(request) do
-    request 
-    |> parse 
+    request
+    |> parse
     |> log
-    |> route 
+    |> route
     |> format_response
   end
 
-  def log(conv), do: IO.inspect conv
+  def log(conv), do: IO.inspect(conv)
 
   def parse(request) do
-    [method, path, _ ] = 
-      request 
+    [method, path, _] =
+      request
       |> String.split("\n")
-      |> List.first
+      |> List.first()
       |> String.split(" ")
 
     %{method: method, path: path, status: nil, resp_body: ""}
@@ -24,11 +24,15 @@ defmodule Servy.Handler do
   end
 
   def route(conv, "GET", "/compute") do
-    %{ conv | status: 200, resp_body: "Lambda, EC2" }
+    %{conv | status: 200, resp_body: "Lambda, EC2"}
   end
 
   def route(conv, "GET", "/messaging") do
-    %{ conv | status: 200, resp_body:  "SQS, SNS, MQ "}
+    %{conv | status: 200, resp_body: "SQS, SNS, MQ "}
+  end
+
+  def route(conv, method, path) do
+    %{conv | status: 404, resp_body: "Nothing in there"}
   end
 
   def format_response(conv) do
@@ -51,7 +55,6 @@ defmodule Servy.Handler do
       500 => "Internal Server Error"
     }[code]
   end
-
 end
 
 request = """
@@ -78,3 +81,15 @@ response = Servy.Handler.handle(request)
 
 IO.puts(response)
 
+
+request = """
+GET /lost HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+response = Servy.Handler.handle(request)
+
+IO.puts(response)
