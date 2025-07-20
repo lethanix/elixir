@@ -2,7 +2,7 @@ defmodule Servy.Handler do
   def handle(request) do
     request
     |> parse
-    |> rewrite_path
+    |> rewrite_compute_path
     |> log
     |> route
     |> track
@@ -11,11 +11,11 @@ defmodule Servy.Handler do
 
   def log(conv), do: IO.inspect(conv)
 
-  def rewrite_path(%{path: "/cloudcompute"} = conv) do
+  def rewrite_compute_path(%{path: "/cloudcompute"} = conv) do
     %{conv | path: "/compute"}
   end
 
-  def rewrite_path(conv), do: conv
+  def rewrite_compute_path(conv), do: conv
 
   def track(%{status: 404, path: path} = conv) do
     IO.puts("WARN: #{path} is not a known service category")
