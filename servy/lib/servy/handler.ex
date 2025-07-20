@@ -17,7 +17,7 @@ defmodule Servy.Handler do
 
   def rewrite_path(conv), do: conv
 
-  def track(%{ status: 404, path: path} = conv) do
+  def track(%{status: 404, path: path} = conv) do
     IO.puts("WARN: #{path} is not a known service category")
     conv
   end
@@ -34,27 +34,23 @@ defmodule Servy.Handler do
     %{method: method, path: path, status: nil, resp_body: ""}
   end
 
-  def route(conv) do
-    route(conv, conv.method, conv.path)
-  end
-
-  def route(conv, "GET", "/compute") do
+  def route(%{method: "GET", path: "/compute"} = conv) do
     %{conv | status: 200, resp_body: "Lambda, EC2"}
   end
 
-  def route(conv, "GET", "/messaging") do
+  def route(%{method: "GET", path: "/messaging"} = conv) do
     %{conv | status: 200, resp_body: "SQS, SNS, MQ"}
   end
 
-  def route(conv, "GET", "/messaging/" <> id) do
+  def route(%{method: "GET", path: "/messaging/" <> id} = conv) do
     %{conv | status: 200, resp_body: "/messaging/#{id}"}
   end
 
-  def route(conv, "DELETE", "/messaging/" <> id) do
+  def route(%{method: "DELETE", path: "/messaging/" <> id} = conv) do
     %{conv | status: 403, resp_body: "Deleting a messaging service is forbidden"}
   end
 
-  def route(conv, method, path) do
+  def route(%{path: path} = conv) do
     %{conv | status: 404, resp_body: "Nothing in there"}
   end
 
