@@ -3,6 +3,7 @@ defmodule Servy.Handler do
     request
     |> parse
     |> rewrite_compute_path
+    |> rewrite_messaging_id_path
     |> log
     |> route
     |> track
@@ -16,6 +17,12 @@ defmodule Servy.Handler do
   end
 
   def rewrite_compute_path(conv), do: conv
+
+  def rewrite_messaging_id_path(%{path: "/messaging?id=" <> id} = conv) do
+    %{conv | path: "/messaging/#{id}"}
+  end
+
+  def rewrite_messaging_id_path(conv), do: conv
 
   def track(%{status: 404, path: path} = conv) do
     IO.puts("WARN: #{path} is not a known service category")
@@ -114,6 +121,18 @@ IO.puts(response)
 
 request = """
 DELETE /messaging/3 HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+response = Servy.Handler.handle(request)
+
+IO.puts(response)
+
+request = """
+GET /messaging?id=1 HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
